@@ -1,33 +1,22 @@
-# Private Vault Cluster Example
+# Vault Cluster with DynamoDB backend example
 
 This folder shows an example of Terraform code to deploy a [Vault](https://www.vaultproject.io/) cluster in
-[AWS](https://aws.amazon.com/) using the [vault-cluster module](https://github.com/hashicorp/terraform-aws-vault/tree/master/modules/vault-cluster). The Vault cluster uses
-[Consul](https://www.consul.io/) as a storage backend, so this example also deploys a separate Consul server cluster
-using the [consul-cluster module](https://github.com/hashicorp/terraform-aws-consul/tree/master/modules/consul-cluster)
-from the Consul AWS Module.
+[AWS](https://aws.amazon.com/) using the [vault-cluster module](https://github.com/hashicorp/terraform-aws-vault/tree/master/modules/vault-cluster).
+The Vault cluster uses [DynamoDB](https://aws.amazon.com/dynamodb/) as a high-availability storage backend and [S3](https://aws.amazon.com/s3/)
+for durable storage, so this example also deploys a separate DynamoDB table
 
-This example creates a private Vault cluster, which is private in the sense that the EC2 Instances are not fronted by a
-load balancer, as is the case in the [Vault Public Example](/examples/root-example). Keep in mind that if the Vault
-nodes are deployed to public subnets (i.e. subnets that have a route to the public Internet), this "private" cluster will
-still be accessible from the public Internet.
-
-Each of the servers in this example has [Dnsmasq](http://www.thekelleys.org.uk/dnsmasq/doc.html) installed (via the
-[install-dnsmasq module](https://github.com/hashicorp/terraform-aws-consul/tree/master/modules/install-dnsmasq)) or
-[setup-systemd-resolved](https://github.com/hashicorp/terraform-aws-consul/tree/master/modules/setup-systemd-resolved)
-(in the case Ubuntu of 18.04) 
-which allows it to use the Consul server cluster for service discovery and thereby access Vault via DNS using the
-domain name `vault.service.consul`. For an example of a Vault cluster
+This example creates a Vault cluster spread across the subnets in the default VPC of the AWS account. For an example of a Vault cluster
 that is publicly accessible, see [the root example](https://github.com/hashicorp/terraform-aws-vault/tree/master/examples/root-example).
 
-![Vault architecture](https://github.com/hashicorp/terraform-aws-vault/blob/master/_docs/architecture.png?raw=true)
+![Vault architecture](https://github.com/hashicorp/terraform-aws-vault/blob/master/_docs/architecture-with-dynamodb.png?raw=true)
 
 You will need to create an [Amazon Machine Image (AMI)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html)
-that has Vault and Consul installed, which you can do using the [vault-consul-ami example](https://github.com/hashicorp/terraform-aws-vault/tree/master/examples/vault-consul-ami)).  
+that has Vault installed, which you can do using the [vault-consul-ami example](https://github.com/hashicorp/terraform-aws-vault/tree/master/examples/vault-consul-ami)).  
 
 For more info on how the Vault cluster works, check out the [vault-cluster](https://github.com/hashicorp/terraform-aws-vault/tree/master/modules/vault-cluster) documentation.
 
 **Note**: To keep this example as simple to deploy and test as possible, it deploys the Vault cluster into your default
-VPC and default subnets, all of which are publicly accessible. This is OK for learning and experimenting, but for
+VPC and default subnets, some of which might be publicly accessible. This is OK for learning and experimenting, but for
 production usage, we strongly recommend deploying the Vault cluster into the private subnets of a custom VPC.
 
 
