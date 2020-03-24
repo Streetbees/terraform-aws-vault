@@ -90,6 +90,19 @@ resource "aws_autoscaling_group" "autoscaling_group" {
   lifecycle {
     create_before_destroy = true
   }
+
+  # Lifecycle hook configuration
+  dynamic "initial_lifecycle_hook" {
+    for_each = length(keys(var.initial_lifecycle_hook)) == 0 ? [] : [var.initial_lifecycle_hook]
+
+    content {
+      name                  = lookup(initial_lifecycle_hook.value, "name", null)
+      default_result        = lookup(initial_lifecycle_hook.value, "default_result", null)
+      heartbeat_timeout     = lookup(initial_lifecycle_hook.value, "heartbeat_timeout", null)
+      lifecycle_transition  = lookup(initial_lifecycle_hook.value, "lifecycle_transition", null)
+      notification_metadata = lookup(initial_lifecycle_hook.value, "notification_metadata", null)
+    }
+  }
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -343,9 +356,9 @@ data "aws_iam_policy_document" "vault_dynamo" {
 }
 
 resource "aws_iam_role_policy" "vault_dynamo" {
-  count  = var.enable_dynamo_backend ? 1 : 0
-  name   = "vault_dynamo"
-  role   = aws_iam_role.instance_role.id
+  count = var.enable_dynamo_backend ? 1 : 0
+  name  = "vault_dynamo"
+  role  = aws_iam_role.instance_role.id
   policy = element(
     concat(data.aws_iam_policy_document.vault_dynamo.*.json, [""]),
     0,

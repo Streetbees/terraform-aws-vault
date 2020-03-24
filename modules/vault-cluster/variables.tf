@@ -236,3 +236,9 @@ variable "dynamo_table_region" {
   type        = string
   default     = ""
 }
+
+variable "initial_lifecycle_hook" {
+  description = "Map of string configureing initial lifecycle hook"
+  type        = map(string)
+  default     = {}
+}
